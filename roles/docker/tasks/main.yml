@@ -1,0 +1,51 @@
+---
+- name: Install docker deps packages
+  become: yes
+  apt:
+    pkg:
+    - ca-certificates
+    - curl
+    - gnupg
+    - lsb-release
+- name: Test if Docker's GPG key is present
+  stat:
+    path: "/usr/share/keyrings/docker-archive-keyring.gpg"
+  register: dockergpg
+- name: Add Docker's official GPG key
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  when: not dockergpg.stat.exists
+- name: Set stable repo
+  shell:
+    cmd: >
+      echo
+      "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg]
+      https://download.docker.com/linux/ubuntu
+      $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+- name: Install docker
+  become: yes
+  apt:
+    update_cache: yes
+    pkg:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+    - docker-compose-plugin
+- name: Remove dependencies that are no longer required
+  become: yes
+  apt:
+    autoremove: yes
+- name: Ensure group "docker" exists
+  become: yes
+  group:
+    name: docker
+    state: present
+- name: Set user settings
+  become: yes
+  user:
+      name: "{{ ansible_user_id }}"
+      shell: /usr/bin/zsh
+      groups: docker
+      append: yes
+      generate_ssh_key: yes
+- name: set the newgroup
+  shell: newgrp docker

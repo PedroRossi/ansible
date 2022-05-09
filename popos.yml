@@ -1,0 +1,13 @@
+- hosts: localhost
+  vars:
+    gnome_extension_ids:
+      - 517   # Caffeine
+      - 277   # impatience
+      - 1414  # Unblank lockscreen
+  roles:
+    - apt
+    - docker
+    - zsh
+    - snap
+    - jaredhocutt.gnome_extensions
+  tasks:

@@ -1,0 +1,22 @@
+---
+- name: Check if running on battery
+  become: yes
+  shell: dmidecode --string chassis-type
+  register: chassis
+- name: Install tlp
+  become: yes
+  apt:
+    pkg:
+    - tlp
+  when: chassis.stdout == "Notebook"
+- name: Install apt packages
+  become: yes
+  apt:
+    pkg:
+    - neovim
+    - autojump
+    - jq
+- name: Remove dependencies that are no longer required
+  become: yes
+  apt:
+    autoremove: yes

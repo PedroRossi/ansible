@@ -1,0 +1,21 @@
+---
+- name: Install apt packages
+  become: yes
+  apt:
+    pkg:
+    - snapd
+- name: add several snap items with --classic tag
+  become: yes
+  snap:
+    name: "{{ item }}"
+    classic: yes
+  loop:
+    - go
+    - code
+- name: Install snap packages
+  become: yes
+  snap:
+    name:
+      - slack
+      - discord
+      - spotify
