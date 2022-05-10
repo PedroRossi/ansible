@@ -16,6 +16,7 @@
     - neovim
     - autojump
     - jq
+    - blueman
 - name: Remove dependencies that are no longer required
   become: yes
   apt:
