@@ -6,8 +6,9 @@
       - 1414  # Unblank lockscreen
   roles:
     - apt
-    - docker
     - zsh
+    - docker
+    - k8s
     - snap
     - jaredhocutt.gnome_extensions
   tasks:

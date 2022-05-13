@@ -1,0 +1,36 @@
+---
+- name: Install helm
+  shell: |
+    curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+    chmod 700 get_helm.sh
+    ./get_helm.sh
+    rm get_helm.sh
+- name: Install kubectl
+  become: yes
+  shell: |
+    curl -Lo kubectl "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    rm kubectl
+- name: Test if kubectl completion is present.
+  stat:
+    path: "${fpath[1]}/_kubectl"
+  register: kubectl
+- name: Add kubectl completion
+  shell: kubectl completion zsh > _kubectl
+  args:
+    chdir: ~/.oh-my-zsh/plugins/git/
+  when: not kubectl.stat.exists
+- name: Install kind
+  become: yes
+  shell: |
+    curl -Lo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+    chmod +x /usr/local/bin/kind
+- name: Test if kind completion is present.
+  stat:
+    path: "${fpath[1]}/_kind"
+  register: kind
+- name: Add kind completion
+  shell: kind completion zsh > '_kind'
+  args:
+    chdir: ~/.oh-my-zsh/plugins/git/
+  when: not kind.stat.exists
