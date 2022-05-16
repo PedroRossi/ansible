@@ -17,6 +17,11 @@
     - autojump
     - jq
     - blueman
+    # libs for installing python
+    - libbz2-dev
+    - libssl-dev
+    - libreadline-dev
+    - libsqlite3-dev
 - name: Remove dependencies that are no longer required
   become: yes
   apt:
