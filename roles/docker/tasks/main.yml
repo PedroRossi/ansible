@@ -49,3 +49,14 @@
       generate_ssh_key: yes
 - name: set the newgroup
   shell: newgrp docker
+- name: Test if docker-compose is present
+  stat:
+    path: "/usr/local/bin/docker-compose"
+  register: dockercompose
+- name: Install docker-compose
+  become: yes
+  shell: |
+    wget -O docker-compose https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
+    chmod +x docker-compose
+    mv docker-compose /usr/local/bin/
+  when: not dockercompose.stat.exists
