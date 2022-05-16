@@ -1,0 +1,10 @@
+---
+- name: Gather the packager facts
+  package_facts:
+- name: Install chrome
+  become: yes
+  shell: |
+    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+    dpkg -i google-chrome-stable_current_amd64.deb
+    rm google-chrome-stable_current_amd64.deb
+  when: "'chrome' in ansible_facts.packages"
