@@ -7,8 +7,10 @@
   roles:
     - apt
     - zsh
+    - pyenv
     - docker
     - k8s
     - snap
+    - chrome
     - jaredhocutt.gnome_extensions
   tasks:
