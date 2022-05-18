@@ -1,7 +1,8 @@
 #!/bin/bash
 
-ANSIBLE_DIR=~/.my-ansible
-ANSIBLE_INIT_FILE=my_ansible.sh
+ANSIBLE_PREFIX=my_ansible
+ANSIBLE_DIR=~/.$ANSIBLE_PREFIX
+ANSIBLE_INIT_FILE=$ANSIBLE_PREFIX.sh
 
 git clone https://github.com/PedroRossi/ansible $ANSIBLE_DIR
 $ANSIBLE_DIR/bin/update-fresh-install.sh
