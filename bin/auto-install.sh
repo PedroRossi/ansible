@@ -1,10 +1,12 @@
-#!/bin/bash
+#!/bin/sh
 
 ANSIBLE_PREFIX=my_ansible
 ANSIBLE_DIR=~/.$ANSIBLE_PREFIX
 ANSIBLE_INIT_FILE=$ANSIBLE_PREFIX.sh
 
+# TODO: check if exists to clone or pull
 git clone https://github.com/PedroRossi/ansible $ANSIBLE_DIR
+# TODO: ask or check before these
 $ANSIBLE_DIR/bin/update-fresh-install.sh
 $ANSIBLE_DIR/bin/install-ansible.sh
 
@@ -23,5 +25,5 @@ esac
 exit 0""" > ~/$ANSIBLE_INIT_FILE
 chmod +x ~/$ANSIBLE_INIT_FILE
 sudo mv ~/$ANSIBLE_INIT_FILE /etc/init.d/
-update-rc.d $ANSIBLE_INIT_FILE defaults
+sudo update-rc.d $ANSIBLE_INIT_FILE defaults
 exit 0
