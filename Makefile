@@ -9,4 +9,4 @@ ansible/deps: ## Download ansible deps
 	ansible-galaxy install -r requirements.yml
 
 ansible/popos: ## Run ansible Pop!_OS recipe
-	ansible-playbook --ask-become-pass popos.yml
+	ansible-playbook -b popos.yml
