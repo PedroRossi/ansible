@@ -17,11 +17,13 @@
     - autojump
     - jq
     - blueman
+    - gparted
     # libs for installing python
     - libbz2-dev
     - libssl-dev
     - libreadline-dev
     - libsqlite3-dev
+    - liblzma-dev
 - name: Remove dependencies that are no longer required
   become: yes
   apt:
