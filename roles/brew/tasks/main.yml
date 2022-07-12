@@ -1,0 +1,29 @@
+---
+- name: Install formulas
+  become: no
+  homebrew:
+    pkg:
+      - docker
+      - neovim
+      - tfenv
+      - go
+      - jq
+      - pyenv
+      - tfenv
+      - kubectl
+      - helm
+      - zsh
+      - zsh-syntax-highlighting
+      - telnet
+- name: Install cask formulas
+  become: no
+  homebrew_cask:
+    pkg:
+      - firefox
+      - google-chrome
+      - iterm2
+      - dbeaver-community
+      - slack
+      - spotify
+      - steam
+      - discord
