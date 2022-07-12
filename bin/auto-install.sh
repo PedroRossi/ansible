@@ -8,10 +8,19 @@ ANSIBLE_INIT_FILE=$ANSIBLE_PREFIX.sh
 git clone https://github.com/PedroRossi/ansible $ANSIBLE_DIR
 # TODO: ask or check before these
 $ANSIBLE_DIR/bin/update-fresh-install.sh
-$ANSIBLE_DIR/bin/install-ansible.sh
 
-# TODO: ask for available playbooks
-PLAYBOOK=popos
+OS=$(uname -s)
+
+if [ "$OS" = "Darwin" ]; then
+  PLAYBOOK=m1
+elif [ "$OS" = "Linux" ]; then
+  DISTRO=$(head -n 1 /etc/issue | cut -d ' ' -f1)
+  if [ "$DISTRO" = "Debian" ]; then
+    PLAYBOOK=debian
+  else
+    PLAYBOOK=popos
+  fi
+fi
 
 echo -e """#!/bin/sh
 # chkconfig: 345 99 10
