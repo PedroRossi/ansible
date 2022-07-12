@@ -24,6 +24,7 @@
     - libreadline-dev
     - libsqlite3-dev
     - liblzma-dev
+    - zsh
 - name: Remove dependencies that are no longer required
   become: yes
   apt:

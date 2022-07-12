@@ -1,9 +1,4 @@
 ---
-- name: Install apt packages
-  become: yes
-  apt:
-    pkg:
-    - zsh
 - name: Test if oh-my-zsh is present.
   stat:
     path: "~/.oh-my-zsh"
