@@ -1,0 +1,8 @@
+- hosts: localhost
+  tasks:
+    - name: Set fixed IP
+      shell: echo 'ok' 
+    - name: Set no sleep
+      shell: echo 'ok' 
+    - name: Install k3s
+      shell: curl -sfL https://get.k3s.io | sh -
