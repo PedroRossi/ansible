@@ -24,7 +24,7 @@ elif [ "$OS" = "Linux" ]; then
   fi
 fi
 
-echo -e """#!/bin/sh
+echo """#!/bin/sh
 # chkconfig: 345 99 10
 case "\$1" in
   start)
