@@ -24,6 +24,6 @@
       register: interfaces
     - name: Disable and bkp interfaces
       shell: mv /etc/network/interfaces /root/interfaces.bkp
-      when: not interfaces.stat.exists
+      when: interfaces.stat.exists
     - name: Install or update k3s
       shell: curl -sfL https://get.k3s.io | sh -
