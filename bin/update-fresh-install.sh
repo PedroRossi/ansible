@@ -20,7 +20,7 @@ elif [ "$OS" = "Linux" ]; then
   $SU apt dist-upgrade -y
   $SU apt autoremove -y
   $SU apt autoclean -y
-  $SU apt install -y software-properties-common make curl git
+  $SU apt install -y software-properties-common make curl git sudo
   $SU add-apt-repository --yes --update ppa:ansible/ansible
   $SU apt install -y ansible
 else
