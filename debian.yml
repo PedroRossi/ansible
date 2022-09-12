@@ -14,5 +14,5 @@
         - 8.8.8.8
         - 1.1.1.1
         state: present
-    - name: Install k3s
+    - name: Install or update k3s
       shell: curl -sfL https://get.k3s.io | sh -
