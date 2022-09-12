@@ -6,8 +6,6 @@ ANSIBLE_INIT_FILE=$ANSIBLE_PREFIX.sh
 
 # TODO: check if exists to clone or pull
 git clone https://github.com/PedroRossi/ansible $ANSIBLE_DIR
-# TODO: ask or check before these
-$ANSIBLE_DIR/bin/update-fresh-install.sh
 
 OS=$(uname -s)
 SU="sudo"
