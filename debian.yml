@@ -48,6 +48,7 @@
         mode: '0777'
     - name: Add apps bootstrap
       shell: kubectl config set-context --current --namespace=argocd && \
+        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml && \
         argocd --core app create apps \
         --dest-namespace argocd \
         --dest-server https://kubernetes.default.svc \
