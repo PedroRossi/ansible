@@ -1,5 +1,15 @@
 - hosts: localhost
   tasks:
+    - name: Install apt packages
+      become: yes
+      apt:
+        pkg:
+        - curl
+        - network-manager
+    - name: Remove dependencies that are no longer required
+      become: yes
+      apt:
+        autoremove: yes
     - name: Retrieve ifname
       shell: nmcli -t device | grep ethern | cut -d ':' -f1 | head -n 1
       register: ifname
@@ -27,3 +37,18 @@
       when: interfaces.stat.exists
     - name: Install or update k3s
       shell: curl -sfL https://get.k3s.io | sh -
+    - name: Create ArgoCD namespace
+      k8s:
+        name: argocd
+        api_version: v1
+        kind: Namespace
+        state: present
+    - name: Download ArgoCD manifest to the cluster.
+      get_url:
+        url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+        dest: /root/argocd.yaml
+        mode: '0664'
+    - name: Apply ArgoCD manifest to the cluster.
+      kubernetes.core.k8s:
+        state: present
+        src: /root/argocd.yaml
