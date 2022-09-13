@@ -40,9 +40,17 @@
     - name: Create ArgoCD namespace
       shell: kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
     - name: Apply ArgoCD manifest to the cluster.
-      shell: kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+      shell: kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/core-install.yaml
     - name: Install ArgoCD CLI
       get_url:
         url: https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
         dest: /usr/local/bin/argocd
         mode: '0777'
+    - name: Add apps bootstrap
+      shell: kubectl config set-context --current --namespace=argocd && \
+        argocd --core app create apps \
+        --dest-namespace argocd \
+        --dest-server https://kubernetes.default.svc \
+        --repo https://github.com/PedroRossi/home.git \
+        --path . \
+        --revision feat/bootstrap
