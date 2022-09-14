@@ -1,0 +1,60 @@
+- hosts: localhost
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+  tasks:
+    - name: Install apt packages
+      become: yes
+      apt:
+        pkg:
+        - curl
+        - network-manager
+    - name: Remove dependencies that are no longer required
+      become: yes
+      apt:
+        autoremove: yes
+    - name: Retrieve ifname
+      shell: nmcli -t device | grep ethern | cut -d ':' -f1 | head -n 1
+      register: ifname
+    - name: Add an Ethernet connection with static IP configuration
+      community.general.nmcli:
+        conn_name: debian-lan
+        ifname: "{{ ifname.stdout }}"
+        type: ethernet
+        # we use a static IP instead of a range of IPs since there is
+        # no dns server in this scenario which in make it imposible to
+        # connect using the host name only
+        ip4: 192.168.2.222
+        gw4: 192.168.2.1
+        dns4:
+        - 8.8.8.8
+        - 1.1.1.1
+        state: present
+        autoconnect: yes
+    - name: Test if interfaces is present.
+      stat:
+        path: "/etc/network/interfaces"
+      register: interfaces
+    - name: Disable and bkp interfaces
+      shell: mv /etc/network/interfaces /root/interfaces.bkp
+      when: interfaces.stat.exists
+    - name: Install or update k3s
+      shell: curl -sfL https://get.k3s.io | sh -
+    - name: Create ArgoCD namespace
+      shell: kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+    - name: Apply ArgoCD manifest to the cluster.
+      shell: kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/core-install.yaml
+    - name: Install ArgoCD CLI
+      get_url:
+        url: https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+        dest: /usr/local/bin/argocd
+        mode: '0777'
+    - name: Set Kubectl context to argocd
+      shell: kubectl config set-context --current --namespace=argocd
+    - name: Add apps bootstrap
+      shell: argocd --core app create apps \
+        --dest-namespace argocd \
+        --dest-server https://kubernetes.default.svc \
+        --repo https://github.com/PedroRossi/home.git \
+        --sync-policy automated \
+        --path . \
+        --revision HEAD
