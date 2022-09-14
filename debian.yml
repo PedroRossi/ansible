@@ -57,4 +57,4 @@
         --repo https://github.com/PedroRossi/home.git \
         --sync-policy automated \
         --path . \
-        --revision feat/bootstrap
+        --revision HEAD
