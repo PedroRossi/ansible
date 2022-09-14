@@ -1,4 +1,6 @@
 - hosts: localhost
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
   tasks:
     - name: Install apt packages
       become: yes
@@ -46,12 +48,13 @@
         url: https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
         dest: /usr/local/bin/argocd
         mode: '0777'
+    - name: Set Kubectl context to argocd
+      shell: kubectl config set-context --current --namespace=argocd
     - name: Add apps bootstrap
-      shell: kubectl config set-context --current --namespace=argocd && \
-        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml && \
-        argocd --core app create apps \
+      shell: argocd --core app create apps \
         --dest-namespace argocd \
         --dest-server https://kubernetes.default.svc \
         --repo https://github.com/PedroRossi/home.git \
+        --sync-policy automated \
         --path . \
         --revision feat/bootstrap
