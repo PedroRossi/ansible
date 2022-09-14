@@ -33,4 +33,7 @@ exit 0""" > ~/$ANSIBLE_INIT_FILE
 chmod +x ~/$ANSIBLE_INIT_FILE
 sudo mv ~/$ANSIBLE_INIT_FILE /etc/init.d/
 sudo update-rc.d $ANSIBLE_INIT_FILE defaults
+if [ "$DISTRO" = "Debian" ]; then
+  echo "0 12 */7 * * /etc/init.d/$ANSIBLE_INIT_FILE start" | crontab -
+fi
 exit 0
