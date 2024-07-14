@@ -23,8 +23,8 @@
         # we use a static IP instead of a range of IPs since there is
         # no dns server in this scenario which in make it imposible to
         # connect using the host name only
-        ip4: 192.168.2.222
-        gw4: 192.168.2.1
+        ip4: 192.168.1.222
+        gw4: 192.168.1.1
         dns4:
         - 8.8.8.8
         - 1.1.1.1
