@@ -11,8 +11,14 @@
   stat:
     path: "/usr/share/keyrings/docker-archive-keyring.gpg"
   register: dockergpg
-- name: Add Docker's official GPG key
-  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+- name: Install GPG keys
+  shell: |
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
+        | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+    curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+        | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
+        | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
   when: not dockergpg.stat.exists
 - name: Set stable repo
   shell:
@@ -30,6 +36,10 @@
     - docker-ce-cli
     - containerd.io
     - docker-compose-plugin
+    - nvidia-container-toolkit
+- name: Set nvidia docker runtime
+  become: yes
+  shell: nvidia-ctk runtime configure --runtime=docker
 - name: Remove dependencies that are no longer required
   become: yes
   apt:

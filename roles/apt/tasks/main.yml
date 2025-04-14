@@ -13,7 +13,6 @@
   become: yes
   apt:
     pkg:
-    - neovim
     - autojump
     - jq
     - blueman

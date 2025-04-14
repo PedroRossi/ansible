@@ -1,0 +1,20 @@
+---
+- name: Test if nvim is present.
+  stat:
+    path: "/opt/nvim/"
+  register: nvim
+- name: Install kubectl
+  become: yes
+  shell: |
+    curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+    rm -rf /opt/nvim
+    tar -C /opt -xzf nvim-linux-x86_64.tar.gz
+    rm nvim-linux-x86_64.tar.gz
+  when: not nvim.stat.exists
+- name: Test if nvchad is present.
+  stat:
+    path: "~/.config/nvim/"
+  register: nvchad
+- name: Install "nvchad"
+  shell: git clone https://github.com/NvChad/starter ~/.config/nvim
+  when: not nvchad.stat.exists
