@@ -11,7 +11,7 @@ ansible/popos: ## Run ansible Pop!_OS recipe
 	ansible-playbook -b popos.yml
 
 ansible/m1: ## Run ansible MacOS M1 recipe
-	ansible-playbook -b m1.yml
+	ansible-playbook -b m1.yml -K
 
 ansible/debian: ## Run ansible Debian recipe
 	ansible-playbook -b debian.yml
