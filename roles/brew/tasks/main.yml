@@ -16,6 +16,8 @@
       - zsh-syntax-highlighting
       - telnet
       - awscli
+      - qwen-code
+      - gemini-cli
 # Ignore for now
 # - name: Install cask formulas
 #   become: no
