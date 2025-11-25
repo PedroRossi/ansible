@@ -1,5 +1,9 @@
 - hosts: localhost
+  gather_facts: true
+  vars:
+    android_tools_version: "13114758"
+    android_sdk_version: "35"
   roles:
     - brew
     - zsh
-  tasks:
+    - android

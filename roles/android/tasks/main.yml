@@ -1,0 +1,87 @@
+---
+- name: Detect the actual login user
+  ansible.builtin.command: logname
+  register: login_user_cmd
+  changed_when: false
+- name: Get info for the real user
+  ansible.builtin.user:
+    name: "{{ login_user_cmd.stdout }}"
+    state: present
+  register: user_info
+- name: Set facts for Real User Home and OS
+  ansible.builtin.set_fact:
+    # We capture the clean variables here
+    android_user: "{{ login_user_cmd.stdout }}"
+    android_home: "{{ user_info.home }}/android"
+    os_type_url: "{{ 'mac' if ansible_facts['system'] == 'Darwin' else 'linux' }}"
+- name: Create android home directory
+  ansible.builtin.file:
+    path: "{{ android_home }}"
+    state: directory
+    mode: '0755'
+- name: Download Android Studio Command Line Tools
+  get_url:
+    url: "https://dl.google.com/android/repository/commandlinetools-{{ os_type_url }}-{{ android_tools_version }}_latest.zip"
+    dest: "/tmp/commandlinetools.zip"
+    mode: '0644'
+- name: Unarchive the zip file
+  unarchive:
+    src: "/tmp/commandlinetools.zip"
+    dest: "{{ android_home }}/"
+    remote_src: yes
+# The structure fix: Move extracted 'cmdline-tools' into 'cmdline-tools/latest'
+- name: Restructure for sdkmanager requirements
+  shell: |
+    rm /tmp/commandlinetools.zip || ls
+    # If the zip extracted 'cmdline-tools' (default behavior)
+    if [ -d "cmdline-tools" ] && [ ! -d "cmdline-tools/latest" ]; then
+        mv cmdline-tools latest
+        mkdir cmdline-tools
+        mv latest cmdline-tools/
+    fi
+  args:
+    chdir: "{{ android_home }}"
+    creates: "{{ android_home }}/cmdline-tools/latest/bin/sdkmanager"
+# Only for dev/debug
+# - name: Verify sdkmanager runs
+#   shell: |
+#     ./cmdline-tools/latest/bin/sdkmanager --version
+#   args:
+#     chdir: "{{ android_home }}"
+#   register: version_check
+# - name: Show sdkmanager version
+#   debug:
+#     msg: "SDKManager installed successfully: {{ version_check.stdout }}"
+- name: Configure Shell Environment Variables
+  blockinfile:
+    path: "{{ user_info.home }}/.zshrc"
+    marker: "# {mark}: ANDROID SDK"
+    block: |
+      export ANDROID_HOME="{{ android_home }}"
+      export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+- name: Ensure Android directory is writable by user
+  file:
+    path: "{{ android_home }}"
+    state: directory
+    owner: "{{ android_user }}"
+    group: "{{ 'staff' if ansible_facts['system'] == 'Darwin' else android_user }}"
+    recurse: yes 
+    mode: '0755'
+- name: Accept Android SDK Licenses
+  shell: |
+    source {{ user_info.home }}/.zshrc
+    yes | sdkmanager --licenses
+  args:
+    executable: /bin/zsh
+- name: Install Android SDK tools
+  shell: |
+    source {{ user_info.home }}/.zshrc
+    sdkmanager --install 'platform-tools'
+    sdkmanager --install 'platforms;android-{{ android_sdk_version }}'
+    sdkmanager --install 'sources;android-{{ android_sdk_version }}'
+    sdkmanager --install 'system-images;android-{{ android_sdk_version }};google_apis_playstore;arm64-v8a'
+    sdkmanager --install 'build-tools;35.0.1'
+    sdkmanager --install 'ndk;27.1.12297006'
+  args:
+    executable: /bin/zsh
+
