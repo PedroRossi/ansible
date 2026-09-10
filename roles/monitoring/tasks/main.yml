@@ -1,0 +1,41 @@
+---
+# Disk-health monitoring (smartd) + a daily backup of Docker app-state volumes.
+- name: Configure smartd
+  become: yes
+  copy:
+    dest: /etc/smartd.conf
+    content: |
+      # Managed by Ansible (nas profile).
+      # Scan every device, enable SMART, run a short test nightly and a long test
+      # weekly, and skip tests while a disk is in standby. Logs to syslog (no email
+      # -- headless box has no MTA). Check: journalctl -u smartmontools
+      DEVICESCAN -a -o on -S on -s (S/../.././02|L/../../6/03) -n standby,q
+  register: smartd_conf
+- name: Enable and start smartd
+  become: yes
+  service:
+    name: smartmontools
+    enabled: yes
+    state: started
+- name: Restart smartd when the config changed
+  become: yes
+  service:
+    name: smartmontools
+    state: restarted
+  when: smartd_conf.changed
+- name: Install the docker-volumes backup cron
+  become: yes
+  copy:
+    dest: /etc/cron.daily/backup-docker-volumes
+    mode: '0755'
+    content: |
+      #!/bin/sh
+      # Managed by Ansible (nas profile).
+      # Back up Docker app-state volumes (Jellyfin history, *arr configs, etc.) to the
+      # pool. Exits cleanly if the pool is not mounted, so it never fills the root disk.
+      set -e
+      BACKUP_DIR="{{ nas_backup_dir }}"
+      mountpoint -q /mnt/storage || exit 0
+      mkdir -p "$BACKUP_DIR"
+      tar -C /var/lib/docker -czf "$BACKUP_DIR/docker-volumes-$(date +%F).tgz" volumes
+      find "$BACKUP_DIR" -name 'docker-volumes-*.tgz' -mtime +14 -delete

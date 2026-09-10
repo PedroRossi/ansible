@@ -1,0 +1,16 @@
+---
+# Portainer CE management UI. The stacks themselves are deployed by hand through it.
+- name: Check if the portainer container already exists
+  become: yes
+  command: docker ps -a --filter name=^portainer$ -q
+  register: portainer_ps
+  changed_when: false
+- name: Run Portainer CE
+  become: yes
+  command: >
+    docker run -d --name portainer --restart=always
+    -p 9443:9443 -p 8000:8000
+    -v /var/run/docker.sock:/var/run/docker.sock
+    -v portainer_data:/data
+    portainer/portainer-ce:latest
+  when: portainer_ps.stdout == ""

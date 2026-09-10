@@ -16,6 +16,9 @@ ansible/m1: ## Run ansible MacOS M1 recipe
 ansible/debian: ## Run ansible Debian recipe
 	ansible-playbook -b debian.yml
 
+ansible/nas: ## Run ansible NAS recipe
+	ansible-playbook -b nas.yml
+
 docker/debian: ## Run docker debian to simulate server for development
 	docker run -it \
 		-v $(shell pwd):/root/ansible/ \

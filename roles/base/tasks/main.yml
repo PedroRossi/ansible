@@ -1,0 +1,67 @@
+---
+# Get the real login user's uid without become, so a global `-b` (which would make
+# facts report root) can't mask it. Matches the android role's real-user detection.
+- name: Get the invoking user's uid
+  become: no
+  command: id -u
+  register: real_uid
+  changed_when: false
+- name: Ensure this profile runs as the uid-1000 user (pedro)
+  assert:
+    that:
+      - real_uid.stdout == "1000"
+    fail_msg: >
+      This profile must run as the uid-1000 user (pedro). All data on the 2TB is owned by
+      uid 1000; a different uid means a mass chown. Current uid is {{ real_uid.stdout }}.
+    success_msg: "Running as uid 1000."
+- name: Install base packages
+  become: yes
+  apt:
+    update_cache: yes
+    pkg:
+    - sudo
+    - curl
+    - git
+    - rsync
+    - smartmontools
+    - htop
+    - tmux
+    - ca-certificates
+    - gnupg
+    - lsb-release
+- name: Remove dependencies that are no longer required
+  become: yes
+  apt:
+    autoremove: yes
+- name: Get current timezone
+  command: timedatectl show -p Timezone --value
+  register: current_tz
+  changed_when: false
+- name: Set timezone to America/Recife
+  become: yes
+  command: timedatectl set-timezone America/Recife
+  when: current_tz.stdout != "America/Recife"
+- name: Ensure ssh server is enabled and running
+  become: yes
+  service:
+    name: ssh
+    enabled: yes
+    state: started
+- name: Test if swapfile is present
+  stat:
+    path: "/swapfile"
+  register: swapfile
+- name: Create an 8G swapfile
+  become: yes
+  shell: |
+    fallocate -l 8G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
+  when: not swapfile.stat.exists
+- name: Add swapfile to fstab
+  become: yes
+  lineinfile:
+    path: /etc/fstab
+    line: "/swapfile none swap sw 0 0"
+    state: present

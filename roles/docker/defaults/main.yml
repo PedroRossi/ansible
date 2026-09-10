@@ -1,0 +1,6 @@
+---
+# Defaults keep the existing Pop!_OS behaviour unchanged.
+# The nas profile overrides these (no GPU, Debian apt repo, bash login shell).
+docker_nvidia: true
+docker_apt_distro: ubuntu
+docker_user_shell: /usr/bin/zsh

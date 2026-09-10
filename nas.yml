@@ -1,0 +1,18 @@
+- hosts: localhost
+  vars:
+    # GPU card is currently out of the machine -> skip the nvidia toolkit/runtime.
+    docker_nvidia: false
+    # Debian docker apt repo (Pop!_OS default stays "ubuntu").
+    docker_apt_distro: debian
+    # Headless box has no zsh; don't set a login shell that isn't installed.
+    docker_user_shell: /bin/bash
+    # The invoking user (pedro on the box) is who joins the docker group. Resolved
+    # on the control node, so a global `-b` can't turn it into root.
+    docker_user: "{{ lookup('env', 'USER') }}"
+    # Where the daily docker-volume backups land (on the manually-managed pool).
+    nas_backup_dir: /mnt/storage/backup
+  roles:
+    - base
+    - docker
+    - portainer
+    - monitoring
