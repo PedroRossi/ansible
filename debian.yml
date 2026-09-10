@@ -7,36 +7,12 @@
       apt:
         pkg:
         - curl
-        - network-manager
     - name: Remove dependencies that are no longer required
       become: yes
       apt:
         autoremove: yes
-    - name: Retrieve ifname
-      shell: nmcli -t device | grep ethern | cut -d ':' -f1 | head -n 1
-      register: ifname
-    - name: Add an Ethernet connection with static IP configuration
-      community.general.nmcli:
-        conn_name: debian-lan
-        ifname: "{{ ifname.stdout }}"
-        type: ethernet
-        # we use a static IP instead of a range of IPs since there is
-        # no dns server in this scenario which in make it imposible to
-        # connect using the host name only
-        ip4: 192.168.1.222
-        gw4: 192.168.1.1
-        dns4:
-        - 8.8.8.8
-        - 1.1.1.1
-        state: present
-        autoconnect: yes
-    - name: Test if interfaces is present.
-      stat:
-        path: "/etc/network/interfaces"
-      register: interfaces
-    - name: Disable and bkp interfaces
-      shell: mv /etc/network/interfaces /root/interfaces.bkp
-      when: interfaces.stat.exists
+    # NOTE: IP addressing is handled outside this repo — a DHCP reservation on the
+    # router (by MAC) or the home-network repo — so no static IP is configured here.
     - name: Install or update k3s
       shell: curl -sfL https://get.k3s.io | sh -
     - name: Create ArgoCD namespace
