@@ -22,6 +22,7 @@
     - sudo
     - curl
     - git
+    - gh
     - rsync
     - smartmontools
     - htop
