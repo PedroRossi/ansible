@@ -37,5 +37,7 @@
       BACKUP_DIR="{{ nas_backup_dir }}"
       mountpoint -q /mnt/storage || exit 0
       mkdir -p "$BACKUP_DIR"
-      tar -C /var/lib/docker -czf "$BACKUP_DIR/docker-volumes-$(date +%F).tgz" volumes
+      # --one-file-system keeps tar on /var/lib/docker's fs so it never follows the media
+      # bind-mounts into the pool (which would archive all of Streaming and fill the disk).
+      tar -C /var/lib/docker --one-file-system -czf "$BACKUP_DIR/docker-volumes-$(date +%F).tgz" volumes
       find "$BACKUP_DIR" -name 'docker-volumes-*.tgz' -mtime +14 -delete
