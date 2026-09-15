@@ -11,8 +11,11 @@
     docker_user: "{{ lookup('env', 'USER') }}"
     # Where the daily docker-volume backups land (on the manually-managed pool).
     nas_backup_dir: /mnt/storage/backup
+    # Incus (LXC system containers + KVM VMs) — join the invoking user to incus-admin.
+    virt_user: "{{ lookup('env', 'USER') }}"
   roles:
     - base
     - docker
     - portainer
     - monitoring
+    - incus
