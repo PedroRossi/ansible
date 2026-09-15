@@ -49,6 +49,12 @@
   become: yes
   shell: nvidia-ctk runtime configure --runtime=docker
   when: docker_nvidia
+- name: Restart docker so it picks up the NVIDIA runtime (enables --gpus)
+  become: yes
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
+  when: docker_nvidia
 - name: Remove dependencies that are no longer required
   become: yes
   apt:
@@ -66,8 +72,6 @@
       groups: docker
       append: yes
       generate_ssh_key: yes
-- name: set the newgroup
-  shell: newgrp docker
 - name: Test if docker-compose is present
   stat:
     path: "/usr/local/bin/docker-compose"

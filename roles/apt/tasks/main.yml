@@ -61,6 +61,22 @@
     pkg:
     - steam-installer
   ignore_errors: yes   # steam is optional — don't block the whole desktop setup on it
+# NVIDIA proprietary driver (Debian non-free) — only if an NVIDIA GPU is present.
+# non-free is already enabled above; the driver needs kernel headers to build its
+# module (DKMS) and auto-blacklists nouveau. A reboot is required to load it.
+- name: Detect an NVIDIA GPU
+  become: yes
+  ansible.builtin.shell: lspci | grep -iE 'nvidia' | grep -iE 'vga|3d' || true
+  register: nvidia_gpu
+  changed_when: false
+- name: Install the NVIDIA driver + kernel headers (non-free)
+  become: yes
+  apt:
+    update_cache: yes
+    pkg:
+    - linux-headers-amd64
+    - nvidia-driver
+  when: nvidia_gpu.stdout != ""
 - name: Remove dependencies that are no longer required
   become: yes
   apt:

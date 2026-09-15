@@ -1,0 +1,36 @@
+---
+# Incus — LXC system containers + KVM VMs from one CLI; Debian's successor to LXD
+# (in the trixie repos). Ideal for isolated, shell-accessed work environments:
+#   incus launch images:debian/13 dev1 && incus shell dev1
+# and full VMs when a container won't do:
+#   incus launch images:debian/13 vm1 --vm
+- name: Install Incus + the KVM backend (for --vm instances)
+  become: yes
+  apt:
+    update_cache: yes
+    pkg:
+    - incus
+    - qemu-system-x86
+    - qemu-utils
+- name: Add the user to incus-admin (manage Incus without sudo)
+  become: yes
+  user:
+    name: "{{ virt_user | default(ansible_user_id) }}"
+    groups: incus-admin
+    append: yes
+- name: Ensure incus is enabled and running
+  become: yes
+  ansible.builtin.systemd:
+    name: incus
+    enabled: yes
+    state: started
+- name: Check whether Incus is already initialised
+  become: yes
+  ansible.builtin.command: incus storage list --format csv
+  register: incus_storage
+  changed_when: false
+  failed_when: false
+- name: Initialise Incus with defaults (dir storage pool + incusbr0 bridge)
+  become: yes
+  ansible.builtin.command: incus admin init --minimal
+  when: incus_storage.stdout | trim == ""
