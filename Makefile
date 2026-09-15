@@ -7,8 +7,8 @@ setup: ## Update fresh install
 ansible/deps: ## Download ansible deps
 	ansible-galaxy install -r requirements.yml
 
-ansible/popos: ## Run ansible Pop!_OS recipe
-	ansible-playbook -b popos.yml
+ansible/desktop: ## Run ansible Debian desktop recipe
+	ansible-playbook -b desktop.yml
 
 ansible/m1: ## Run ansible MacOS M1 recipe
 	ansible-playbook -b m1.yml -K

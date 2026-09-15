@@ -16,7 +16,7 @@ elif [ "$OS" = "Linux" ]; then
   if [ "$DISTRO" = "Debian" ]; then
     PLAYBOOK=debian
   else
-    PLAYBOOK=popos
+    PLAYBOOK=desktop
   fi
 fi
 

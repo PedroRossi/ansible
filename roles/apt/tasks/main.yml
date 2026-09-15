@@ -1,8 +1,14 @@
 ---
+- name: Install dmidecode (needed to detect the chassis type below)
+  become: yes
+  apt:
+    pkg:
+    - dmidecode
 - name: Check if running on battery
   become: yes
   shell: dmidecode --string chassis-type
   register: chassis
+  changed_when: false
 - name: Install tlp
   become: yes
   apt:
@@ -17,7 +23,6 @@
     - jq
     - blueman
     - gparted
-    - steam
     - zsh
     # libs for installing python
     - libbz2-dev
@@ -25,6 +30,37 @@
     - libreadline-dev
     - libsqlite3-dev
     - liblzma-dev
+# Steam on Debian: it lives in non-free and needs the 32-bit (i386) runtime.
+# (Pop!_OS/Ubuntu ship it in multiverse as "steam"; Debian calls it "steam-installer".)
+- name: Enable i386 multiarch for Steam's 32-bit runtime
+  become: yes
+  ansible.builtin.command: dpkg --add-architecture i386
+  changed_when: false
+- name: Detect apt sources format (deb822 vs classic)
+  ansible.builtin.stat:
+    path: /etc/apt/sources.list.d/debian.sources
+  register: deb822_sources
+- name: Enable contrib + non-free (deb822 debian.sources)
+  become: yes
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list.d/debian.sources
+    regexp: '^Components: main( non-free-firmware)?$'
+    replace: 'Components: main contrib non-free non-free-firmware'
+  when: deb822_sources.stat.exists
+- name: Enable contrib + non-free (classic sources.list)
+  become: yes
+  ansible.builtin.replace:
+    path: /etc/apt/sources.list
+    regexp: '^(deb(-src)? .*debian.* main)( non-free-firmware)?\s*$'
+    replace: '\1 contrib non-free non-free-firmware'
+  when: not deb822_sources.stat.exists
+- name: Install Steam (steam-installer, from non-free)
+  become: yes
+  apt:
+    update_cache: yes
+    pkg:
+    - steam-installer
+  ignore_errors: yes   # steam is optional — don't block the whole desktop setup on it
 - name: Remove dependencies that are no longer required
   become: yes
   apt:

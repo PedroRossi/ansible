@@ -1,0 +1,23 @@
+- hosts: localhost
+  vars:
+    gnome_extension_ids:
+      - 517   # Caffeine
+      - 277   # impatience
+      - 1414  # Unblank lockscreen
+    # Debian desktop (migrated off Pop!_OS): use the Debian docker apt repo, and
+    # join the invoking user (pedro) to the docker group — resolved on the control
+    # node so a global `-b` can't make it root. The PC has a GTX 1660 SUPER.
+    docker_apt_distro: debian
+    docker_nvidia: true
+    docker_user: "{{ lookup('env', 'USER') }}"
+  roles:
+    - apt
+    - zsh
+    - nvchad
+    - pyenv
+    - docker
+    - k8s
+    - snap
+    - chrome
+    - jaredhocutt.gnome_extensions
+  tasks:

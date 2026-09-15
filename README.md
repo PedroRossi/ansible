@@ -15,7 +15,7 @@ Run `make` for help and usage
 
 ## Profiles
 
-- `make ansible/popos` — Pop!_OS desktop
+- `make ansible/desktop` — Debian desktop (migrated off Pop!_OS)
 - `make ansible/m1` — macOS (Apple Silicon)
 - `make ansible/debian` — Debian k3s/ArgoCD server
 - `make ansible/nas` — headless Debian NAS (Docker, Portainer CE, smartd, daily volume backups)
