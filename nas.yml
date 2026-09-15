@@ -5,7 +5,7 @@
     # Debian docker apt repo (Pop!_OS default stays "ubuntu").
     docker_apt_distro: debian
     # Headless box has no zsh; don't set a login shell that isn't installed.
-    docker_user_shell: /bin/bash
+    docker_user_shell: /usr/bin/zsh
     # The invoking user (pedro on the box) is who joins the docker group. Resolved
     # on the control node, so a global `-b` can't turn it into root.
     docker_user: "{{ lookup('env', 'USER') }}"
@@ -15,6 +15,7 @@
     virt_user: "{{ lookup('env', 'USER') }}"
   roles:
     - base
+    - zsh
     - docker
     - portainer
     - monitoring

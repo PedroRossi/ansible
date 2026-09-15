@@ -12,9 +12,11 @@
     rm nvim-linux-x86_64.tar.gz
   when: not nvim.stat.exists
 - name: Test if nvchad is present.
+  become: no
   stat:
     path: "~/.config/nvim/"
   register: nvchad
 - name: Install "nvchad"
+  become: no   # ~/.config/nvim belongs to the user, not root
   shell: git clone https://github.com/NvChad/starter ~/.config/nvim
   when: not nvchad.stat.exists

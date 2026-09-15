@@ -1,8 +1,15 @@
 ---
+# These configure the *invoking* user's home (~), so they must NOT become root
+# even under the playbook's global `-b` — otherwise oh-my-zsh lands in /root
+# while the user keeps a bare zsh (the zsh-newuser-install prompt).
 - name: Test if oh-my-zsh is present.
+  become: no
   stat:
     path: "~/.oh-my-zsh"
   register: ohmyzsh
 - name: Install "oh-my-zsh"
-  shell: RUNZSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  become: no
+  # CHSH=no: don't let the installer run chsh (it would prompt for a password
+  # non-interactively); the docker role sets the login shell to zsh separately.
+  shell: RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
   when: not ohmyzsh.stat.exists

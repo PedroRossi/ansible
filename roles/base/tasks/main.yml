@@ -27,6 +27,7 @@
     - smartmontools
     - htop
     - tmux
+    - zsh
     - ca-certificates
     - gnupg
     - lsb-release

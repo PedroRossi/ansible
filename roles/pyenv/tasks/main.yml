@@ -1,5 +1,6 @@
 ---
 - name: Install pyenv
+  become: no   # writes ~/.pyenv and ~/.zshrc — must run as the user, not root
   shell: |
     curl https://pyenv.run | bash
     echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc

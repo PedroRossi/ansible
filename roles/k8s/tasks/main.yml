@@ -16,6 +16,7 @@
     path: "${fpath[1]}/_kubectl"
   register: kubectl
 - name: Add kubectl completion
+  become: no   # writes into the user's ~/.oh-my-zsh
   shell: kubectl completion zsh > _kubectl
   args:
     chdir: ~/.oh-my-zsh/plugins/git/
@@ -30,6 +31,7 @@
     path: "${fpath[1]}/_kind"
   register: kind
 - name: Add kind completion
+  become: no   # writes into the user's ~/.oh-my-zsh
   shell: kind completion zsh > '_kind'
   args:
     chdir: ~/.oh-my-zsh/plugins/git/
