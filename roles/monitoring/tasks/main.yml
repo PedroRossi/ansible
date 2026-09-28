@@ -39,5 +39,7 @@
       mkdir -p "$BACKUP_DIR"
       # --one-file-system keeps tar on /var/lib/docker's fs so it never follows the media
       # bind-mounts into the pool (which would archive all of Streaming and fill the disk).
-      tar -C /var/lib/docker --one-file-system --exclude=volumes/streaming_slskd/_data/incomplete -czf "$BACKUP_DIR/docker-volumes-$(date +%F).tgz" volumes
+      # tar exits 1 (not 2) when a live file changes while being read, e.g. slskd's
+      # databases; that is a warning, the archive is still written, so keep going.
+      tar -C /var/lib/docker --one-file-system --exclude=volumes/streaming_slskd/_data/incomplete -czf "$BACKUP_DIR/docker-volumes-$(date +%F).tgz" volumes || [ $? -eq 1 ]
       find "$BACKUP_DIR" -name 'docker-volumes-*.tgz' -mtime +14 -delete
